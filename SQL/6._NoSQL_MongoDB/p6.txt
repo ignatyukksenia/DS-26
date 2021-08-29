@@ -1,0 +1,107 @@
+--создание БД
+use netology
+
+--создание коллекции
+db.createCollection('students')
+
+--добавление одной записи (документа)
+db.students.insert({ firstname: "Andrey",
+  lastname: "Petrov",
+  age: 12,
+  subjects: ["literature", "history", "mathematics"] })
+
+db.students.insert({ firstname: "Alexey",
+  lastname: "Ivanov",
+  age: 25,
+  subjects: ["history", "mathematics"] })
+
+--добавление нескольких записей (документов)
+db.students.insertMany( [{ firstname: "Andrey",
+  lastname: "Vetrov",
+  age: 55,
+  subjects: ["physics", "anatomy"] },
+  { firstname: "Ivan",
+  lastname: "Vetrov",
+  age: 16,
+  subjects: ["physics", "anatomy"] },
+  {
+  firstname: "Ivan",
+  lastname: "Alexeev",
+  age: 24,
+  subjects: ["chemistry", "literature"]
+  } ]) 
+
+--поиск нужной записи с указание какие столбцы выводить
+db.students.find({firstname: "Andrey"}, {firstname: 1, lastname: 1})
+
+--поиск нужной записи с указанием какие столбцы не выводить
+db.students.find({firstname: "Alexey"}, {age: 0})
+
+--поиск нужной записи по вложенному элементу
+db.students.find({'subjects.0': "literature"})
+
+--сортировка по ключу по возрастанию
+db.students.find().sort({firstname: 1})
+
+--сортировка по ключу по убыванию
+db.students.find().sort({age: -1})
+
+--использование лимита
+db.students.find().limit(3)
+
+--пропуск значений (аналог offset)
+db.students.find().skip(2)
+
+--лимит с пропуском
+db.students.find().skip(2).limit(1)
+
+--количество записей
+db.students.count() 
+
+--количество нужных записей
+db.students.find({firstname: "Andrey"}).count() 
+
+--получение уникальных значений
+db.students.distinct(firstname)
+
+--использование логических операторов и операторов сравнения. Конструкция:
+db.students.find({логический_оператор : [{ключ: {оператор_сравнения: значение}}, {ключ: {оператор_сравнения: значение}}]})
+
+- операторы сравнения:
+$eq (равно)
+$ne (не равно)
+$gt (больше чем)
+$lt (меньше чем)
+$gte (больше или равно)
+$lte (меньше или равно)
+$in определяет массив значений, одно из которых должно иметь поле документа
+$nin определяет массив значений, которые не должно иметь поле документа
+
+- логические операторы:
+$or: соединяет два условия, и документ должен соответствовать одному из этих условий
+$and: соединяет два условия, и документ должен соответствовать обоим условиям
+$not: документ должен НЕ соответствовать условию
+$nor: соединяет два условия, и документ должен НЕ соответстовать обоим условиям
+
+db.students.find({$and : [{firstname: "Andrey"}, {age: {$lte: 55}}]})
+
+--обновить запись
+db.students.update({lastname: "Vetrov"}, {$set: {lastname : "Sidorov"}}, {multi: true})
+upsert  = true => обновлять документ, если он найден, и создавать новый, если такого документа нет
+upsert = false => не  создавать новый документ, если запрос на выборку не найдет ни одного документа
+multi = false => обновить первый элемент в выборке (используется по умолчанию, если данный параметр не указан) 
+multi = true = > должны обновляться все документы в выборке
+
+--удаление записи
+db.students.remove({age: 12})
+
+--удаление всех записей
+db.students.remove({})
+
+--удалить коллекцию
+db.students.drop()
+
+--удалить БД
+db.dropDatabase()
+
+https://docs.mongodb.com/manual/reference/operator/aggregation/
